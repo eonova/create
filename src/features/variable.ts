@@ -1,6 +1,6 @@
+import type { Choice, ConfigVariable, Context } from '../types'
 import { isCancel, select, text } from '@clack/prompts'
 import { CliError, resolveCallbackable, resolveCallbackables } from '../utils'
-import type { Choice, ConfigVariable, Context } from '../types'
 
 export async function variable(context: Context): Promise<void> {
   const { template, project } = context
@@ -23,11 +23,13 @@ export async function variable(context: Context): Promise<void> {
         initialValue: variable.initial,
         placeholder,
         validate: (value) => {
-          if (variable.required && !value) return 'This field is required.'
+          if (variable.required && !value)
+            return 'This field is required.'
           return undefined
         },
       })
-    } else {
+    }
+    else {
       value = await select({
         message: variable.message,
         initialValue: variable.initial,
@@ -38,10 +40,11 @@ export async function variable(context: Context): Promise<void> {
         ),
       })
     }
-    if (isCancel(value))
+    if (isCancel(value)) {
       throw new CliError(
         'Variable input canceled. Please run the command again.',
       )
+    }
 
     project.variables[key] = value
   }

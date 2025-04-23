@@ -1,9 +1,9 @@
+import type { Callbackable, Context } from './types'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 import ansis from 'ansis'
 import { findUp } from 'find-up-simple'
 import { x } from 'tinyexec'
-import type { Callbackable, Context } from './types'
 
 export const COLORS = [
   'black',
@@ -44,13 +44,17 @@ export const COLORS = [
   'bgWhiteBright',
 ] as const
 
-const isColor = (color: string): color is (typeof COLORS)[number] =>
-  COLORS.includes(color as any)
+function isColor(color: string): color is (typeof COLORS)[number] {
+  return COLORS.includes(color as any)
+}
 
 export function getColor(color?: string): (text: string) => string {
-  if (!color) return (v) => v
-  else if (isColor(color)) return ansis[color]
-  else if (color.startsWith('#')) return ansis.hex(color)
+  if (!color)
+    return v => v
+  else if (isColor(color))
+    return ansis[color]
+  else if (color.startsWith('#'))
+    return ansis.hex(color)
   throw new Error(`Unknown color: ${color}`)
 }
 
@@ -58,7 +62,8 @@ export async function which(command: string): Promise<number> {
   try {
     const { exitCode } = await x('which', [command])
     return exitCode!
-  } catch (error: any) {
+  }
+  catch (error: any) {
     return error.exitCode
   }
 }
@@ -76,7 +81,6 @@ export async function findConfigTypePath(): Promise<string> {
   return pkgPath
 }
 
-// eslint-disable-next-line require-await
 export async function resolveCallbackable<T>(
   cb: Callbackable<T>,
   context: Context,
@@ -91,7 +95,7 @@ export function resolveCallbackables<T>(
   cbs: Callbackable<T>[],
   context: Context,
 ): Promise<T[]> {
-  return Promise.all(cbs.map((cb) => resolveCallbackable(cb, context)))
+  return Promise.all(cbs.map(cb => resolveCallbackable(cb, context)))
 }
 
 export class CliError extends Error {

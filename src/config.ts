@@ -1,3 +1,4 @@
+import type { Config, ConfigReplace, ConfigTemplate } from './types'
 import { mkdir, readFile, writeFile } from 'node:fs/promises'
 import { homedir } from 'node:os'
 import path from 'node:path'
@@ -10,7 +11,6 @@ import { dump, load } from 'js-yaml'
 import { x } from 'tinyexec'
 import { loadConfig } from 'unconfig'
 import { CliError, cmdExists, findConfigTypePath } from './utils'
-import type { Config, ConfigReplace, ConfigTemplate } from './types'
 
 type MergeObject<O, T> = Omit<O, keyof T> & T
 
@@ -42,13 +42,13 @@ const demoConfig: Config = {
         {
           name: 'TypeScript',
           color: '#3178c6',
-          url: 'sxzz/node-lib-starter',
+          url: 'eonova/ts-starter',
         },
       ],
     },
     {
       name: 'Web App',
-      url: 'sxzz/node-lib-starter',
+      url: 'eonova/vitesse-star',
       git: {
         init: false,
       },
@@ -91,13 +91,14 @@ export async function getConfig({
     }
   }
 
-  if (!init)
+  if (!init) {
     return {
       exists: false,
       init: false,
       config: undefined as any,
       file: '',
     }
+  }
 
   consola.warn(ansis.yellowBright('No configuration file found.'))
 
@@ -105,7 +106,8 @@ export async function getConfig({
   await editConfig(filePath)
 
   const newConfig = await getConfig({ init: false })
-  if (!newConfig) throw new CliError('No configuration file found.')
+  if (!newConfig)
+    throw new CliError('No configuration file found.')
   return { ...newConfig, init: true }
 }
 
@@ -119,7 +121,7 @@ export async function initConfig(): Promise<string> {
   }
 
   const options = (['JavaScript', 'TypeScript', 'JSON', 'YAML'] as const).map(
-    (kind) => ({ value: kind }),
+    kind => ({ value: kind }),
   )
   const kind = await select({
     message: 'What kind of configuration file do you want to create?',
@@ -167,13 +169,17 @@ export async function editConfig(filePath: string): Promise<void> {
   const EDITOR = process.env.EDITOR
   if (EDITOR && (await cmdExists(EDITOR))) {
     await x(EDITOR, [filePath], { nodeOptions: { stdio: 'inherit' } })
-  } else if (await cmdExists('code')) {
+  }
+  else if (await cmdExists('code')) {
     await x('code', [filePath])
-  } else if (await cmdExists('zed')) {
+  }
+  else if (await cmdExists('zed')) {
     await x('zed', [filePath], { nodeOptions: { stdio: 'inherit' } })
-  } else if (await cmdExists('vim')) {
+  }
+  else if (await cmdExists('vim')) {
     await x('vim', [filePath], { nodeOptions: { stdio: 'inherit' } })
-  } else {
+  }
+  else {
     consola.info(
       `Editors are not detected, please open and edit config file manually: ${filePath}`,
     )
@@ -193,17 +199,17 @@ export function normalizeTemplate(
   const normalizeReplaces = (
     replaces: ConfigTemplate['replaces'],
   ): ConfigReplace[] => {
-    if (!replaces) return []
+    if (!replaces)
+      return []
     return Array.isArray(replaces)
       ? replaces
       : toArray(replaces.items).map(
-          (replace) =>
-            // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
-            ({
-              ...objectPick(replaces, ['from', 'to', 'include', 'exclude']),
-              ...replace,
-            }) as ConfigReplace,
-        )
+        replace =>
+          ({
+            ...objectPick(replaces, ['from', 'to', 'include', 'exclude']),
+            ...replace,
+          }) as ConfigReplace,
+      )
   }
 
   const mergeTemplate = (
@@ -214,7 +220,7 @@ export function normalizeTemplate(
     ...b,
     git: {
       ...a.git,
-      ...(b.git || {}),
+      ...b.git,
     },
     replaces: [
       ...normalizeReplaces(a.replaces),

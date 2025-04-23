@@ -1,15 +1,16 @@
-import path from 'node:path'
-import { toArray } from '@antfu/utils'
-import ansis from 'ansis'
-import consola from 'consola'
-import escapeStringRegexp from 'escape-string-regexp'
-import { replaceInFile, type ReplaceInFileConfig } from 'replace-in-file'
+import type { ReplaceInFileConfig } from 'replace-in-file'
 import type {
   ConfigReplace,
   ConfigReplaceFromCallback,
   ConfigReplaceToCallback,
   Context,
 } from '../types'
+import path from 'node:path'
+import { toArray } from '@antfu/utils'
+import ansis from 'ansis'
+import consola from 'consola'
+import escapeStringRegexp from 'escape-string-regexp'
+import { replaceInFile } from 'replace-in-file'
 
 export async function replace(ctx: Context): Promise<void> {
   const { template } = ctx
@@ -27,28 +28,32 @@ async function doReplace(
   const { all = true, ignoreCase = false } = replace
 
   const buildPattern = (from: string | RegExp) => {
-    if (typeof from !== 'string') return from
-    if (!(all || ignoreCase)) return from
+    if (typeof from !== 'string')
+      return from
+    if (!(all || ignoreCase))
+      return from
 
     let flags = ''
-    if (ignoreCase) flags += 'i'
-    if (all) flags += 'g'
+    if (ignoreCase)
+      flags += 'i'
+    if (all)
+      flags += 'g'
     return new RegExp(escapeStringRegexp(from), flags)
   }
 
   const from = (
     typeof replace.from === 'function'
-      ? (file) =>
-          (replace.from as ConfigReplaceFromCallback)({
-            file,
-            project,
-            template,
-          })
-      : toArray(replace.from).map((from) => buildPattern(from))
+      ? file =>
+        (replace.from as ConfigReplaceFromCallback)({
+          file,
+          project,
+          template,
+        })
+      : toArray(replace.from).map(from => buildPattern(from))
   ) as ReplaceInFileConfig['from']
 
-  const to: ReplaceInFileConfig['to'] =
-    typeof replace.to === 'function'
+  const to: ReplaceInFileConfig['to']
+    = typeof replace.to === 'function'
       ? (match, file) =>
           (replace.to as ConfigReplaceToCallback)({
             match,
@@ -70,7 +75,8 @@ async function doReplace(
     },
   })
   for (const result of results) {
-    if (!result.hasChanged) continue
+    if (!result.hasChanged)
+      continue
     consola.info(
       `${ansis.blue.bold(
         path.relative(project.path, result.file),

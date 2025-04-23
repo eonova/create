@@ -1,5 +1,5 @@
-import type { TemplateNormalized } from './config'
 import type { Arrayable, Awaitable } from '@antfu/utils'
+import type { TemplateNormalized } from './config'
 
 export interface ProjectInfo {
   url: string
@@ -55,13 +55,13 @@ export interface Choice {
   hint?: string
 }
 
-export type ConfigVariable = { message: string; initial?: string } & (
+export type ConfigVariable = { message: string, initial?: string } & (
   | {
-      type: 'text'
-      required?: boolean
-      placeholder?: Callbackable<string>
-    }
-  | { type: 'select'; choices: string[] | Choice[] }
+    type: 'text'
+    required?: boolean
+    placeholder?: Callbackable<string>
+  }
+  | { type: 'select', choices: string[] | Choice[] }
 )
 
 export type Callbackable<T> = Awaitable<T> | ((ctx: Context) => Awaitable<T>)

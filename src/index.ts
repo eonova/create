@@ -1,3 +1,5 @@
+import type { ConfigNormalized, TemplateNormalized } from './config'
+import type { Config, ConfigTemplate, Context, ProjectInfo } from './types'
 import path from 'node:path'
 import process from 'node:process'
 import { objectKeys, objectPick } from '@antfu/utils'
@@ -6,18 +8,17 @@ import ansis from 'ansis'
 import consola from 'consola'
 import { downloadTemplate } from 'giget'
 import {
+
   editConfig,
   getConfig,
   normalizeTemplate,
-  type ConfigNormalized,
-  type TemplateNormalized,
+
 } from './config'
 import { command } from './features/command'
 import { git } from './features/git'
 import { replace } from './features/replace'
 import { variable } from './features/variable'
 import { CliError, getColor } from './utils'
-import type { Config, ConfigTemplate, Context, ProjectInfo } from './types'
 
 export type { Config }
 export function defineConfig(config: Config): Config {
@@ -35,18 +36,22 @@ export async function edit(): Promise<void> {
 export async function run({
   projectPath,
   config,
-}: { projectPath?: string; config?: ConfigNormalized } = {}): Promise<void> {
+}: { projectPath?: string, config?: ConfigNormalized } = {}): Promise<void> {
   try {
     config ||= (await getConfig()).config
 
-    intro(ansis.bgBlueBright(' @sxzz/create '))
+    intro(ansis.bgBlueBright(' @eonova/create '))
     const templates = await chooseTemplate(config)
     const template = normalizeTemplate(templates)
     await create({ projectPath, template })
-  } catch (error) {
+  }
+  catch (error) {
     if (error instanceof CliError) {
       consola.error(error.message)
-    } else consola.error(error)
+    }
+    else {
+      consola.error(error)
+    }
   }
 }
 
@@ -56,7 +61,7 @@ async function chooseTemplate(config: ConfigNormalized) {
     children: config.templates,
     ...objectPick(
       config,
-      objectKeys(config).filter((k) => k !== 'templates'),
+      objectKeys(config).filter(k => k !== 'templates'),
     ),
   }
 
@@ -84,13 +89,14 @@ async function chooseTemplate(config: ConfigNormalized) {
     )!
     if (template.url) {
       return [...templateStacks, template]
-    } else if (template.children) {
+    }
+    else if (template.children) {
       templateStacks.push(template)
       currentTemplate = template
-    } else {
+    }
+    else {
       throw new Error(`Bad template: ${JSON.stringify(template)}`)
     }
-    // eslint-disable-next-line no-constant-condition
   } while (true)
 }
 
@@ -105,7 +111,7 @@ async function create({
   if (!relativePath) {
     relativePath = await text({
       message: 'Folder name of the project',
-      validate: (v) =>
+      validate: v =>
         v.length === 0 ? 'folder name cannot be empty.' : undefined,
     })
   }

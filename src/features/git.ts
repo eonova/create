@@ -1,10 +1,11 @@
+import type { Context } from '../types'
 import ansis from 'ansis'
 import consola from 'consola'
 import { x } from 'tinyexec'
-import type { Context } from '../types'
 
 export async function git({ template, project }: Context): Promise<void> {
-  if (template.git.init === false) return
+  if (template.git.init === false)
+    return
 
   await x('git', ['init', project.path], {
     nodeOptions: {
@@ -19,7 +20,7 @@ export async function git({ template, project }: Context): Promise<void> {
         stdio: ['ignore', 'ignore', 'inherit'],
         cwd: project.path,
       },
-    }).then((res) => res.stdout.trim())
+    }).then(res => res.stdout.trim())
 
   if (template.git.add) {
     await run('git', ['add', '.'])

@@ -42,13 +42,13 @@ const demoConfig: Config = {
         {
           name: 'TypeScript',
           color: '#3178c6',
-          url: 'eonova/ts-starter',
+          url: 'eonova/starter-ts',
         },
       ],
     },
     {
       name: 'Web App',
-      url: 'eonova/vitesse-star',
+      url: 'eonova/starter-next',
       git: {
         init: false,
       },

@@ -6,4 +6,4 @@ templates:
     children:
       - name: TypeScript
         color: '#3178c6'
-        url: eonova/ts-starter
+        url: eonova/starter-ts
